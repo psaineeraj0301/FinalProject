@@ -1,38 +1,70 @@
 pipeline {
     agent any
-    
+
     environment {
-        // Define environment variables
         DOCKER_IMAGE = 'neeraj0307/finalpro-dev:latest'
+        DOCKER_REPO_DEV = 'neeraj0307/finalpro-dev'
+        DOCKER_REPO_PROD = 'neeraj0307/finalpro-prod'
+        SERVER_HOST = 'ip-172-31-26-149'
+        SERVER_USER = 'ubuntu'
+        SERVER_PORT = '22' // Default SSH port
+        DOCKER_PASSWORD = 'docker@0307'
+        DOCKER_USERNAME = 'neeraj0307'
     }
-    
+
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
-                // Pull Docker image from Docker Hub
-                // script {
-                //     docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").pull()
-                // }
-                
-                // Run Docker container
-                // sh 'docker run -d -p 8080:80 ${DOCKER_IMAGE}:${env.BUILD_NUMBER}'
+                git 'https://github.com/psaineeraj0301/FinalProject.git'
+            }
+        }
 
-                // Checkout your code repository
-                git 'git@github.com:psaineeraj0301/FinalProject.git'
-                sh 'cd FinalProject'
-                sh 'sudo curl -SL https://github.com/docker/compose/releases/download/v2.26.1/docker-compose-linux-x86_64 -o /tmp/docker-compose'
-                sh 'ls -lart /tmp/docker-compose'
-                sh 'sudo chmod +x /tmp/docker-compose'
-                sh 'tmp/docker-compose --version'
-                sh 'sudo mv /tmp/docker-compose /usr/local/bin'
+        stage('Build and Push') {
+            when {
+                branch 'dev'
+            }
+            steps {
+                script {
+                    sh 'docker build -t $DOCKER_IMAGE .'
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
+                        sh 'docker tag $DOCKER_IMAGE $DOCKER_REPO_DEV'
+                        sh 'docker push $DOCKER_REPO_DEV'
+                    }
+                }
+            }
+        }
 
-                sh './deploy.sh'
-                
-                // Install dependencies and build the React app
-                // sh 'npm install'
-                // sh 'npm run build'
+        stage('Deploy to Dev') {
+            when {
+                branch 'dev'
+            }
+            steps {
+                script {
+                    sshagent(credentials: ['your_ssh_credentials_id']) {
+                        sh '''ssh -o StrictHostKeyChecking=no -p $SERVER_PORT $SERVER_USER@$SERVER_HOST
+                        git "https://github.com/psaineeraj0301/FinalProject.git"
+                        cd FinalProject
+                        docker pull ${DOCKER_REPO_DEV} && docker-compose -f ./docker-compose.yml up -d'''
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Prod') {
+            when {
+                branch 'main'
+            }
+            steps {
+                script {
+                    sshagent(credentials: ['your_ssh_credentials_id']) {
+                        sh '''ssh -o StrictHostKeyChecking=no -p $SERVER_PORT $SERVER_USER@$SERVER_HOST
+                        git "https://github.com/psaineeraj0301/FinalProject.git"
+                        cd FinalProject
+                        docker pull ${DOCKER_REPO_PROD} && docker-compose -f ./docker-compose.yml up -d'''
+                    }
+                }
             }
         }
     }
 }
-
