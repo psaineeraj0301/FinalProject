@@ -43,7 +43,7 @@ pipeline {
                 script {
                     sshagent(credentials: ['your_ssh_credentials_id']) {
                         sh '''ssh -o StrictHostKeyChecking=no -p $SERVER_PORT $SERVER_USER@$SERVER_HOST
-                        git "https://github.com/psaineeraj0301/FinalProject.git"
+                        git "git@github.com:psaineeraj0301/FinalProject.git"
                         cd FinalProject
                         docker pull ${DOCKER_REPO_DEV} && docker-compose -f ./docker-compose.yml up -d'''
                     }
@@ -59,7 +59,7 @@ pipeline {
                 script {
                     sshagent(credentials: ['your_ssh_credentials_id']) {
                         sh '''ssh -o StrictHostKeyChecking=no -p $SERVER_PORT $SERVER_USER@$SERVER_HOST
-                        git "https://github.com/psaineeraj0301/FinalProject.git"
+                        git "git@github.com:psaineeraj0301/FinalProject.git"
                         cd FinalProject
                         docker pull ${DOCKER_REPO_PROD} && docker-compose -f ./docker-compose.yml up -d'''
                     }
