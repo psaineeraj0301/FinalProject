@@ -51,19 +51,19 @@ pipeline {
             }
         }
 
-        stage('Deploy to Prod') {
-            when {
-                branch 'main'
-            }
-            steps {
-                script {
-                    sshagent(credentials: ['your_ssh_credentials_id']) {
-                        sh '''ssh -o StrictHostKeyChecking=no -p $SERVER_PORT $SERVER_USER@$SERVER_HOST
-                        git "git@github.com:psaineeraj0301/FinalProject.git"
-                        cd FinalProject
-                        docker pull ${DOCKER_REPO_PROD} && docker-compose -f ./docker-compose.yml up -d'''
-                    }
+        stage('Docker Build and Push') {     
+            if (env.BRANCH_NAME == 'dev') { 
+                docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
+                    def app = docker.build("your-docker-username/your-app-name:dev")
+                    app.push()
                 }
+            }
+            else if (emv.BRANCH_NAME == 'master') {
+                docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
+                    def app = docker.build("your-docker-username/your-app-name:dev")
+                    app.push()
+                }
+
             }
         }
     }
