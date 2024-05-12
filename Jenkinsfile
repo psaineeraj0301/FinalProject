@@ -1,77 +1,70 @@
-
 pipeline {
     agent any
 
     environment {
-        AWS_ACCESS_KEY_ID = credentialsId('aws-access-key-id', type: 'SecretText')
-        AWS_SECRET_ACCESS_KEY = credentialsId('aws-secret-access-key', type: 'SecretText')
-        SERVER_IP = '35.91.63.106' // Replace with your server's IP
-        SSH_PRIVATE_KEY = credentialsId('ssh-private-key', type: 'SSHPrivateKey')
+        DOCKER_IMAGE = 'neeraj0307/finalpro-dev:latest'
+        DOCKER_REPO_DEV = 'neeraj0307/finalpro-dev'
+        DOCKER_REPO_PROD = 'neeraj0307/finalpro-prod'
+        SERVER_HOST = 'ip-172-31-16-49'
+        SERVER_USER = 'ubuntu'
+        SERVER_PORT = '22' // Default SSH port
+        DOCKER_PASSWORD = 'docker@0307'
+        DOCKER_USERNAME = 'neeraj0307'
     }
 
     stages {
-        stage('Checkout Code') {
-    steps {
-        git branch: 'master', credentialsId: 'jenkins-git-http', url: 'https://github.com/psaineeraj0301/FinalProject.git'
-
-        // Replace the above with this for older Jenkins versions:
-        // withCredentials([usernamePassword(credentialsId: 'jenkins-git-http', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
-        //     sh 'git checkout ...' // Your checkout commands
-         }
-    }
-
-        stage('Build and Push Docker Image') {
-            when {
-                branch 'dev'
-            }
+        stage('Checkout') {
             steps {
-                script {
-                    docker.withRegistry('https://hub.docker.com', 'docker-hub-credentials') {
-                        def appImage = docker.build('neeraj0307/finalpro-dev/neeraj0307/finalpro-dev')
-                        appImage.push()
-                    }
-                }
+                git 'https://github.com/psaineeraj0301/FinalProject.git'
             }
         }
 
-        stage('Build and Push Docker Image (Prod)') {
+        stage('Build and Push') {
             when {
                 branch 'master'
             }
             steps {
                 script {
-                    docker.withRegistry('https://hub.docker.com', 'docker-hub-credentials') {
-                        def appImage = docker.build('neeraj0307/finalpro-prod/neeraj0307/finalpro-prod')
-                        appImage.push()
+                    sh 'docker build -t $DOCKER_IMAGE .'
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
+                        sh 'docker tag $DOCKER_IMAGE $DOCKER_REPO_DEV'
+                        sh 'docker push $DOCKER_REPO_DEV'
                     }
                 }
             }
         }
 
-        stage('Deploy to Server') {
+        stage('Deploy to Dev') {
             when {
-                anyOf {
-                    branch 'dev'
-                    branch 'master'
-                }
+                branch 'dev'
             }
             steps {
                 script {
-                    ssh(
-                        credentials: SSH_PRIVATE_KEY,
-                        user: 'ubuntu', // Replace with your server username (if different)
-                        host: SERVER_IP,
-                        timeout: 30,
-                        script: '''
-                            sudo docker pull your_docker_username/devops-build:${env.BRANCH_NAME}
-                            sudo docker stop devops-build || true  # Stop container if running
-                            sudo docker rm devops-build || true     # Remove container if exists
-                            sudo docker run -d --name devops-build -p 80:80 your_docker_username/devops-build:${env.BRANCH_NAME}
-                        '''
-                    )
+                    sshagent(credentials: ['your_ssh_credentials_id']) {
+                        sh '''ssh -o StrictHostKeyChecking=no -p $SERVER_PORT $SERVER_USER@$SERVER_HOST
+                        git "git@github.com:psaineeraj0301/FinalProject.git"
+                        cd FinalProject
+                        docker pull ${DOCKER_REPO_DEV} && docker-compose -f ./docker-compose.yml up -d'''
+                    }
                 }
             }
         }
-     }
 
+        stage('Docker Build and Push') {     
+            if (env.BRANCH_NAME == 'dev') { 
+                docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
+                    def app = docker.build("your-docker-username/your-app-name:dev")
+                    app.push()
+                }
+            }
+            else if (emv.BRANCH_NAME == 'master') {
+                docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
+                    def app = docker.build("your-docker-username/your-app-name:dev")
+                    app.push()
+                }
+
+            }
+        }
+    }
 }
