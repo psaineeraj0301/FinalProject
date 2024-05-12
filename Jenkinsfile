@@ -5,14 +5,14 @@ pipeline {
     environment {
         AWS_ACCESS_KEY_ID = credentialsId('aws-access-key-id', type: 'SecretText')
         AWS_SECRET_ACCESS_KEY = credentialsId('aws-secret-access-key', type: 'SecretText')
-        SERVER_IP = '34.211.235.69' // Replace with your server's IP
+        SERVER_IP = '35.91.63.106' // Replace with your server's IP
         SSH_PRIVATE_KEY = credentialsId('ssh-private-key', type: 'SSHPrivateKey')
     }
 
     stages {
         stage('Checkout Code') {
     steps {
-        git branch: 'main', credentialsId: 'jenkins-git-http', url: 'https://github.com/psaineeraj0301/test_repo.git'
+        git branch: 'master', credentialsId: 'jenkins-git-http', url: 'https://github.com/psaineeraj0301/FinalProject.git'
 
         // Replace the above with this for older Jenkins versions:
         // withCredentials([usernamePassword(credentialsId: 'jenkins-git-http', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
@@ -36,7 +36,7 @@ pipeline {
 
         stage('Build and Push Docker Image (Prod)') {
             when {
-                branch 'main'
+                branch 'master'
             }
             steps {
                 script {
@@ -52,7 +52,7 @@ pipeline {
             when {
                 anyOf {
                     branch 'dev'
-                    branch 'main'
+                    branch 'master'
                 }
             }
             steps {
