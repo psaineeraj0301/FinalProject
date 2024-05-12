@@ -2,9 +2,7 @@ pipeline {
     agent any
 
     triggers {
-        githubPush {
-            branches(['dev', 'master'])
-        }
+        githubPush()
     }
 
     stages {
