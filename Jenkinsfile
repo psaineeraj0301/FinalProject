@@ -4,6 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'neeraj0307/finalpro'
         DOCKER_V = '12'
+        BRANCH = 'dev'
     }
     
     stages {
