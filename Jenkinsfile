@@ -1,49 +1,39 @@
 pipeline {
     agent any
-    
-    stages {
-        stage('Build and Push to Dev') {
-            when {
-                branch 'dev'
-            }
-            steps {
-                script {
-                    // Checkout code from GitHub
-                    checkout scm
-                    
-                    // Build Docker image
-                    sh 'docker build -t finalpro_dev .'
-                    
-                    // Push Docker image to Dev repository in Docker Hub
-                    sh 'docker login -u neeraj0307 -p docker@0307'
-                    sh 'docker tag finalpro_dev neeraj0307/finalpro_dev:latest'
-                    sh 'docker push neeraj0307/finalpro_dev:latest'
-                }
-            }
-        }
-        
-        stage('Build and Push to Prod') {
-            when {
-                branch 'master'
-            }
-            steps {
-                script {
-                    // Checkout code from GitHub
-                    checkout scm
-                    
-                    // Build Docker image
-                    sh 'docker build -t finalpro_prod .'
-                    
-                    // Push Docker image to Prod repository in Docker Hub
-                    sh 'docker login -u neeraj0307 -p docker@0307'
-                    sh 'docker tag finalpro_prod neeraj0307/finalpro_prod:latest'
-                    sh 'docker push neeraj0307/finalpro_prod:latest'
-                }
-            }
-        }
-    }
-    
+
     triggers {
-        githubPush()
+        githubPush {
+            branches(['dev', 'master'])
+        }
     }
+
+    stages {
+        stage('Build and Push Dev') {
+            when {
+                expression { env.BRANCH_NAME == 'dev' }
+            }
+            steps {
+                sh 'docker build -t $DEV_IMG .'
+                sh 'docker tag $DEV_IMG $DEV_REPO_URL'
+                sh 'docker push $DEV_REPO_URL'
+            }
+        }
+        stage('Build and Push Prod') {
+            when {
+                expression { env.BRANCH_NAME == 'master' }
+            }
+            steps {
+                sh 'docker build -t $PROD_IMG .'
+                sh 'docker tag $PROD_IMG $PROD_REPO_URL'
+                sh 'docker push $PROD_REPO_URL'
+            }
+        }
+    }
+}
+
+environment {
+    DEV_REPO_URL = 'neeraj0307/finalpro-dev:latest'
+    PROD_REPO_URL = 'neeraj0307/finalpro-prod:latest'
+    PROD_IMG = 'myprod_img'
+    DEV_IMG = 'mydev_img'
 }
