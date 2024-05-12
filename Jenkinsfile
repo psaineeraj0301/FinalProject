@@ -1,42 +1,42 @@
 pipeline {
     agent any
 
-    triggers {
-        githubPush()
-    }
-
     environment {
-        DEV_REPO_URL = 'neeraj0307/finalpro-dev:latest'
-        PROD_REPO_URL = 'neeraj0307/finalpro-prod:latest'
-        PROD_IMG = 'myprod_img'
-        DEV_IMG = 'mydev_img'
+        DOCKER_IMAGE = 'neeraj0307/finalpro'
+        DOCKER_V = '12'
     }
-
+    
     stages {
-        stage('Build and Push Dev') {
-            when {
-                expression { env.BRANCH_NAME == 'dev' }
-            }
+        stage('Check') {
             steps {
                 script {
-                    sh "docker build -t ${DEV_IMG} ."
-                    sh "docker tag ${DEV_IMG} ${DEV_REPO_URL}"
-                    sh "docker push ${DEV_REPO_URL}"
+                    sh 'ls'
+                    echo "CURENT BRNCH - ${env.BRANCH}"
                 }
             }
         }
-        stage('Build and Push Prod') {
-            when {
-                expression { env.BRANCH_NAME == 'master' }
-            }
+        stage('Build Docker Image') {
             steps {
                 script {
-                    sh "docker build -t ${PROD_IMG} ."
-                    sh "docker tag ${PROD_IMG} ${PROD_REPO_URL}"
-                    sh "docker push ${PROD_REPO_URL}"
+                    docker.build("${DOCKER_IMAGE}:${env.BUILD_NUMBER}")
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    if (env.BRANCH_NAME == 'master') {
+                        docker.withRegistry('https://registry.hub.docker.com','docker-hub-credentials-prod') {
+                            docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
+                        }
+                    } else if (env.BRANCH_NAME == 'dev') {
+                        docker.withRegistry('https://registry.hub.docker.com','docker-hub-crendentials-dev') {
+                            docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
+                        }
+                    }
                 }
             }
         }
     }
 }
-
