@@ -48,23 +48,23 @@ pipeline {
             steps {
                 script {
                     echo "Pushing Stage ${env.BRANCH}"
-                    if (env.BRANCH == 'dev') {
-                        echo "DEV Pushing Stage"
-                        docker.withRegistry('https://registry.hub.docker.com', 'dockerpass') {
-                            echo "Pushing Docker image ${DOCKER_IMAGE}:${env.BUILD_NUMBER} to repository..."
-                            docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
-                            echo "Docker image pushed successfully."
-                        }
-                    }
-                    // if (env.BRANCH == 'master') {
-                    //     docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
-                    //         docker.image("${DOCKER_IMAGE}:${env.BRANCH}").push()
-                    //     }
-                    // } else if (env.BRANCH == 'dev') {
-                    //     docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
-                    //         docker.image("${DOCKER_IMAGE}:${env.BRANCH}").push()
+                    // if (env.BRANCH == 'dev') {
+                    //     echo "DEV Pushing Stage"
+                    //     docker.withRegistry('https://registry.hub.docker.com', 'dockerpass') {
+                    //         echo "Pushing Docker image ${DOCKER_IMAGE}:${env.BUILD_NUMBER} to repository..."
+                    //         docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
+                    //         echo "Docker image pushed successfully."
                     //     }
                     // }
+                    if (env.BRANCH == 'master') {
+                        docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
+                            docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
+                        }
+                    } else if (env.BRANCH == 'dev') {
+                        docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
+                            docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
+                        }
+                    }
                 }
             }
         }
