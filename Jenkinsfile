@@ -20,10 +20,10 @@ pipeline {
             steps {
                 script {
                     // Ensure Jenkins user is in the Docker group
-                    sh 'sudo usermod -aG docker jenkins || true'
+                    // sh 'sudo usermod -aG docker jenkins || true'
 
                     // Restart Docker service
-                    sh 'sudo service docker restart || true'
+                    // sh 'sudo service docker restart || true'
                     
                     // Build Docker image
                     docker.build("${DOCKER_IMAGE}:${env.BUILD_NUMBER}")
