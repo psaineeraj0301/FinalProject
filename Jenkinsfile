@@ -11,6 +11,8 @@ pipeline {
         stage('Check') {
             steps {
                 script {
+                    // Check if Docker is installed, if not, install it
+                    sh 'docker --version || { curl -fsSL https://get.docker.com/ | sh; }'
                     sh 'ls'
                     echo "CURRENT BRNCH - ${env.BRANCH}"
                 }
