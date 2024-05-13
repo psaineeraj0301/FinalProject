@@ -4,7 +4,8 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'neeraj0307/finalpro'
         DOCKER_V = '12'
-        // BRANCH = 'dev'
+        BRANCH_DEV = 'dev'
+        BRANCH_MASTER = 'master'
     }
     
     stages {
@@ -26,7 +27,7 @@ pipeline {
                     
                     // Continue with other checks
                     sh 'ls'
-                    echo "CURRENT BRANCH - ${env.GIT_LOCAL_BRANCH}, ${env.GIT_BRANCH}"
+                    echo "CURRENT BRANCH - ${env.GIT_BRANCH}"
                     echo "this env -  ${env}"
                 }
             }
@@ -60,12 +61,12 @@ pipeline {
                     // }
                     if (env.GIT_BRANCH == 'origin/master') {
                         docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
-                            docker.image("${DOCKER_IMAGE}_${env.GIT_BRANCH}:${env.BUILD_NUMBER}").push()
+                            docker.image("${DOCKER_IMAGE}_${BRANCH_MASTER}:${env.BUILD_NUMBER}").push()
                             echo "Docker image pushed successfully."
                         }
-                    } else if (env.GIT_BRANCH == 'dev') {
+                    } else if (env.GIT_BRANCH == 'origin/dev') {
                         docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
-                            docker.image("${DOCKER_IMAGE}_${env.GIT_BRANCH}:${env.BUILD_NUMBER}").push()
+                            docker.image("${DOCKER_IMAGE}_${BRANCH_DEV}:${env.BUILD_NUMBER}").push()
                             echo "Docker image pushed successfully."
                         }
                     }
