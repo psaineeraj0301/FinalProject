@@ -48,8 +48,10 @@ pipeline {
             steps {
                 script {
                     if (env.BRANCH_NAME == 'dev') {
-                        docker.withRegistry('https://registry.hub.docker.com','docker-hub-crendentials-dev') {
+                        docker.withRegistry('https://registry.hub.docker.com', 'mydockerkey') {
+                            echo "Pushing Docker image ${DOCKER_IMAGE}:${env.BUILD_NUMBER} to repository..."
                             docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
+                            echo "Docker image pushed successfully."
                         }
                     }
                     // if (env.BRANCH_NAME == 'master') {
