@@ -26,7 +26,8 @@ pipeline {
                     
                     // Continue with other checks
                     sh 'ls'
-                    echo "CURRENT BRANCH - ${env.BRANCH_NAME}"
+                    echo "CURRENT BRANCH - ${env.BRANCH_NAME}, ${env.GIT_BRANCH}"
+                    echo "this env -  ${env}"
                 }
             }
         }
