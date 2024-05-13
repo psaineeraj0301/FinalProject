@@ -58,7 +58,7 @@ pipeline {
                     //         echo "Docker image pushed successfully."
                     //     }
                     // }
-                    if (env.GIT_BRANCH == 'master') {
+                    if (env.GIT_BRANCH == 'origin/master') {
                         docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
                             docker.image("${DOCKER_IMAGE}_${env.GIT_BRANCH}:${env.BUILD_NUMBER}").push()
                             echo "Docker image pushed successfully."
