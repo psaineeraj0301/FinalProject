@@ -42,7 +42,7 @@ pipeline {
                     // sh 'sudo service docker restart || true'
                     
                     // Build Docker image
-                    docker.build("${DOCKER_IMAGE}_${env.GIT_BRANCH}:${env.BUILD_NUMBER}")
+                    docker.build("${DOCKER_IMAGE}_${env.GIT_BRANCH.split('/')[-1]}:${env.BUILD_NUMBER}")
                 }
             }
         }
@@ -61,12 +61,12 @@ pipeline {
                     // }
                     if (env.GIT_BRANCH == 'origin/master') {
                         docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
-                            docker.image("${DOCKER_IMAGE}_${BRANCH_MASTER}:${env.BUILD_NUMBER}").push()
+                            docker.image("${DOCKER_IMAGE}_${env.GIT_BRANCH.split('/')[-1]}:${env.BUILD_NUMBER}").push()
                             echo "Docker image pushed successfully."
                         }
                     } else if (env.GIT_BRANCH == 'origin/dev') {
                         docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
-                            docker.image("${DOCKER_IMAGE}_${BRANCH_DEV}:${env.BUILD_NUMBER}").push()
+                            docker.image("${DOCKER_IMAGE}_${env.GIT_BRANCH.split('/')[-1]}:${env.BUILD_NUMBER}").push()
                             echo "Docker image pushed successfully."
                         }
                     }
