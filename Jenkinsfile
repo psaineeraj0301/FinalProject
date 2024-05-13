@@ -58,12 +58,12 @@ pipeline {
                     //         echo "Docker image pushed successfully."
                     //     }
                     // }
-                    if (env.GIT_LOCAL_BRANCH == 'master') {
+                    if (env.GIT_BRANCH == 'master') {
                         docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
                             docker.image("${DOCKER_IMAGE}_${env.GIT_BRANCH}:${env.BUILD_NUMBER}").push()
                             echo "Docker image pushed successfully."
                         }
-                    } else if (env.GIT_LOCAL_BRANCH == 'dev') {
+                    } else if (env.GIT_BRANCH == 'dev') {
                         docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
                             docker.image("${DOCKER_IMAGE}_${env.GIT_BRANCH}:${env.BUILD_NUMBER}").push()
                             echo "Docker image pushed successfully."
