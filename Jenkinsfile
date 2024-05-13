@@ -26,7 +26,7 @@ pipeline {
                     
                     // Continue with other checks
                     sh 'ls'
-                    echo "CURRENT BRANCH - ${env.BRANCH_NAME}, ${env.GIT_BRANCH}"
+                    echo "CURRENT BRANCH - ${env.GIT_LOCAL_BRANCH}, ${env.GIT_BRANCH}"
                     echo "this env -  ${env}"
                 }
             }
@@ -41,7 +41,7 @@ pipeline {
                     // sh 'sudo service docker restart || true'
                     
                     // Build Docker image
-                    docker.build("${DOCKER_IMAGE}_${env.BRANCH_NAME}:${env.BUILD_NUMBER}")
+                    docker.build("${DOCKER_IMAGE}_${env.GIT_BRANCH}:${env.BUILD_NUMBER}")
                 }
             }
         }
@@ -49,7 +49,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    echo "Pushing Stage ${env.BRANCH_NAME}"
+                    echo "Pushing Stage ${env.GIT_BRANCH}"
                     // if (env.BRANCH == 'dev') {
                     //     echo "DEV Pushing Stage"
                     //     docker.withRegistry('https://registry.hub.docker.com', 'dockerpass') {
@@ -58,14 +58,14 @@ pipeline {
                     //         echo "Docker image pushed successfully."
                     //     }
                     // }
-                    if (env.BRANCH_NAME == 'master') {
+                    if (env.GIT_LOCAL_BRANCH == 'master') {
                         docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
-                            docker.image("${DOCKER_IMAGE}_${env.BRANCH_NAME}:${env.BUILD_NUMBER}").push()
+                            docker.image("${DOCKER_IMAGE}_${env.GIT_BRANCH}:${env.BUILD_NUMBER}").push()
                             echo "Docker image pushed successfully."
                         }
-                    } else if (env.BRANCH_NAME == 'dev') {
+                    } else if (env.GIT_LOCAL_BRANCH == 'dev') {
                         docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
-                            docker.image("${DOCKER_IMAGE}_${env.BRANCH_NAME}:${env.BUILD_NUMBER}").push()
+                            docker.image("${DOCKER_IMAGE}_${env.GIT_BRANCH}:${env.BUILD_NUMBER}").push()
                             echo "Docker image pushed successfully."
                         }
                     }
