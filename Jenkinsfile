@@ -11,6 +11,7 @@ pipeline {
         stage('Check') {
             steps {
                 script {
+                     checkout scm
                     // Check if Docker is installed, if not, install it
                     // sh 'docker --version || { curl -fsSL https://get.docker.com/ | sh; }'
                     
