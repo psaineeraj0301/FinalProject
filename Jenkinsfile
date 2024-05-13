@@ -40,7 +40,7 @@ pipeline {
                     // sh 'sudo service docker restart || true'
                     
                     // Build Docker image
-                    docker.build("${DOCKER_IMAGE}:${env.BUILD_NUMBER}")
+                    docker.build("${DOCKER_IMAGE}_${env.BRANCH_NAME}:${env.BUILD_NUMBER}")
                 }
             }
         }
@@ -59,11 +59,11 @@ pipeline {
                     // }
                     if (env.BRANCH_NAME == 'master') {
                         docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
-                            docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
+                            docker.image("${DOCKER_IMAGE}_${env.BRANCH_NAME}:${env.BUILD_NUMBER}").push()
                         }
                     } else if (env.BRANCH_NAME == 'dev') {
                         docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
-                            docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
+                            docker.image("${DOCKER_IMAGE}_${env.BRANCH_NAME}:${env.BUILD_NUMBER}").push()
                         }
                     }
                 }
