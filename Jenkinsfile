@@ -47,7 +47,9 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
+                    echo "Pushing Stage"
                     if (env.BRANCH_NAME == 'dev') {
+                        echo "DEV Pushing Stage"
                         docker.withRegistry('https://registry.hub.docker.com', 'mydockerkey') {
                             echo "Pushing Docker image ${DOCKER_IMAGE}:${env.BUILD_NUMBER} to repository..."
                             docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
