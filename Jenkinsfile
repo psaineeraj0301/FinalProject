@@ -47,8 +47,8 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    echo "Pushing Stage ${env.BRANCH_NAME}"
-                    if (env.BRANCH_NAME == 'dev') {
+                    echo "Pushing Stage ${env.BRANCH}"
+                    if (env.BRANCH == 'dev') {
                         echo "DEV Pushing Stage"
                         docker.withRegistry('https://registry.hub.docker.com', 'dockerpass') {
                             echo "Pushing Docker image ${DOCKER_IMAGE}:${env.BUILD_NUMBER} to repository..."
@@ -56,13 +56,13 @@ pipeline {
                             echo "Docker image pushed successfully."
                         }
                     }
-                    // if (env.BRANCH_NAME == 'master') {
-                    //     docker.withRegistry('https://registry.hub.docker.com','docker-hub-credentials-prod') {
-                    //         docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
+                    // if (env.BRANCH == 'master') {
+                    //     docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
+                    //         docker.image("${DOCKER_IMAGE}:${env.BRANCH}").push()
                     //     }
-                    // } else if (env.BRANCH_NAME == 'dev') {
-                    //     docker.withRegistry('https://registry.hub.docker.com','docker-hub-crendentials-dev') {
-                    //         docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
+                    // } else if (env.BRANCH == 'dev') {
+                    //     docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
+                    //         docker.image("${DOCKER_IMAGE}:${env.BRANCH}").push()
                     //     }
                     // }
                 }
