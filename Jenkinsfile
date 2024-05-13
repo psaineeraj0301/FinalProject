@@ -60,10 +60,12 @@ pipeline {
                     if (env.BRANCH_NAME == 'master') {
                         docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
                             docker.image("${DOCKER_IMAGE}_${env.BRANCH_NAME}:${env.BUILD_NUMBER}").push()
+                            echo "Docker image pushed successfully."
                         }
                     } else if (env.BRANCH_NAME == 'dev') {
                         docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
                             docker.image("${DOCKER_IMAGE}_${env.BRANCH_NAME}:${env.BUILD_NUMBER}").push()
+                            echo "Docker image pushed successfully."
                         }
                     }
                 }
