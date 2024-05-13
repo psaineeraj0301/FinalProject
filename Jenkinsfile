@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'neeraj0307/finalpro'
         DOCKER_V = '12'
-        BRANCH = 'dev'
+        // BRANCH = 'dev'
     }
     
     stages {
@@ -25,7 +25,7 @@ pipeline {
                     
                     // Continue with other checks
                     sh 'ls'
-                    echo "CURRENT BRANCH - ${env.BRANCH}"
+                    echo "CURRENT BRANCH - ${env.BRANCH_NAME}"
                 }
             }
         }
@@ -47,7 +47,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    echo "Pushing Stage ${env.BRANCH}"
+                    echo "Pushing Stage ${env.BRANCH_NAME}"
                     // if (env.BRANCH == 'dev') {
                     //     echo "DEV Pushing Stage"
                     //     docker.withRegistry('https://registry.hub.docker.com', 'dockerpass') {
@@ -56,11 +56,11 @@ pipeline {
                     //         echo "Docker image pushed successfully."
                     //     }
                     // }
-                    if (env.BRANCH == 'master') {
+                    if (env.BRANCH_NAME == 'master') {
                         docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
                             docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
                         }
-                    } else if (env.BRANCH == 'dev') {
+                    } else if (env.BRANCH_NAME == 'dev') {
                         docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
                             docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
                         }
