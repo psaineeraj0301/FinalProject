@@ -4,13 +4,15 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'neeraj0307/finalpro'
         DOCKER_V = '12'
-        BRANCH = 'dev'
+        BRANCH_DEV = 'dev'
+        BRANCH_MASTER = 'master'
     }
     
     stages {
         stage('Check') {
             steps {
                 script {
+                     checkout scm
                     // Check if Docker is installed, if not, install it
                     // sh 'docker --version || { curl -fsSL https://get.docker.com/ | sh; }'
                     
@@ -25,7 +27,8 @@ pipeline {
                     
                     // Continue with other checks
                     sh 'ls'
-                    echo "CURRENT BRANCH - ${env.BRANCH}"
+                    echo "CURRENT BRANCH - ${env.GIT_BRANCH}"
+                    echo "this env -  ${env}"
                 }
             }
         }
@@ -39,7 +42,7 @@ pipeline {
                     // sh 'sudo service docker restart || true'
                     
                     // Build Docker image
-                    docker.build("${DOCKER_IMAGE}:${env.BUILD_NUMBER}")
+                    docker.build("${DOCKER_IMAGE}_${env.GIT_BRANCH.split('/')[-1]}:${env.BUILD_NUMBER}")
                 }
             }
         }
@@ -47,7 +50,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    echo "Pushing Stage ${env.BRANCH}"
+                    echo "Pushing Stage ${env.GIT_BRANCH}"
                     // if (env.BRANCH == 'dev') {
                     //     echo "DEV Pushing Stage"
                     //     docker.withRegistry('https://registry.hub.docker.com', 'dockerpass') {
@@ -56,13 +59,15 @@ pipeline {
                     //         echo "Docker image pushed successfully."
                     //     }
                     // }
-                    if (env.BRANCH == 'master') {
+                    if (env.GIT_BRANCH == 'origin/master') {
                         docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
-                            docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
+                            docker.image("${DOCKER_IMAGE}_${env.GIT_BRANCH.split('/')[-1]}:${env.BUILD_NUMBER}").push()
+                            echo "Docker image pushed successfully."
                         }
-                    } else if (env.BRANCH == 'dev') {
+                    } else if (env.GIT_BRANCH == 'origin/dev') {
                         docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
-                            docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
+                            docker.image("${DOCKER_IMAGE}_${env.GIT_BRANCH.split('/')[-1]}:${env.BUILD_NUMBER}").push()
+                            echo "Docker image pushed successfully."
                         }
                     }
                 }
