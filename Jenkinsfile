@@ -12,13 +12,13 @@ pipeline {
             steps {
                 script {
                     // Check if Docker is installed, if not, install it
-                    sh 'docker --version || { curl -fsSL https://get.docker.com/ | sh; }'
+                    // sh 'docker --version || { curl -fsSL https://get.docker.com/ | sh; }'
                     
                     // Add Jenkins user to the Docker group
-                    sh 'sudo usermod -aG docker jenkins'
+                    // sh 'sudo usermod -aG docker jenkins'
                     
                     // Restart Jenkins to apply changes (optional)
-                    sh 'sudo systemctl restart jenkins'
+                    // sh 'sudo systemctl restart jenkins'
                     
                     // List Docker images to verify Docker installation
                     sh 'docker images'
