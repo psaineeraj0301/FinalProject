@@ -60,12 +60,12 @@ pipeline {
                     //     }
                     // }
                     if (env.GIT_BRANCH == 'origin/master') {
-                        docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
+                        docker.withRegistry('https://registry.hub.docker.com','dockerhub-pswd') {
                             docker.image("${DOCKER_IMAGE}_${env.GIT_BRANCH.split('/')[-1]}:${env.BUILD_NUMBER}").push()
                             echo "Docker image pushed successfully."
                         }
                     } else if (env.GIT_BRANCH == 'origin/dev') {
-                        docker.withRegistry('https://registry.hub.docker.com','dockerpass') {
+                        docker.withRegistry('https://registry.hub.docker.com','dockerhub-pswd') {
                             docker.image("${DOCKER_IMAGE}_${env.GIT_BRANCH.split('/')[-1]}:${env.BUILD_NUMBER}").push()
                             echo "Docker image pushed successfully."
                         }
