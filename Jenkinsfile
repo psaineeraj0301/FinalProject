@@ -6,8 +6,6 @@ pipeline {
         DOCKER_V = '12'
         BRANCH_DEV = 'dev'
         BRANCH_MASTER = 'master'
-        DOCKER_REGISTRY = 'https://registry.hub.docker.com'
-        DOCKER_PASSKEY = credentials('dockerpass')
     }
     
     stages {
@@ -62,13 +60,13 @@ pipeline {
                     //     }
                     // }
                     if (env.GIT_BRANCH == 'origin/master') {
-                        docker.withRegistry("${DOCKER_REGISTRY}", "${DOCKER_PASSKEY}") {
-                            docker.image("${DOCKER_IMAGE}_${env.GIT_BRANCH.split('/')[-1]}:${env.BUILD_NUMBER}").push('latest')
+                        docker.withRegistry('https://registry.hub.docker.com','dockerhub-pswd') {
+                            docker.image("${DOCKER_IMAGE}_${env.GIT_BRANCH.split('/')[-1]}:${env.BUILD_NUMBER}").push()
                             echo "Docker image pushed successfully."
                         }
                     } else if (env.GIT_BRANCH == 'origin/dev') {
-                        docker.withRegistry("${DOCKER_REGISTRY}", "${DOCKER_PASSKEY}") {
-                            docker.image("${DOCKER_IMAGE}_${env.GIT_BRANCH.split('/')[-1]}:${env.BUILD_NUMBER}").push('latest')
+                        docker.withRegistry('https://registry.hub.docker.com','dockerhub-pswd') {
+                            docker.image("${DOCKER_IMAGE}_${env.GIT_BRANCH.split('/')[-1]}:${env.BUILD_NUMBER}").push()
                             echo "Docker image pushed successfully."
                         }
                     }
