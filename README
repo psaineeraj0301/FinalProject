@@ -1,2 +1,2 @@
-Running Jenkins using git https<br >
-to work with ssh Key, run this cmd and add in jenkins creds - ssh-keyscan -H github.com
+Running Jenkins using git https<br > ssh Key is working we need to change the settings 
+and error occurs when run the build, 
