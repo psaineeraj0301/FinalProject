@@ -55,9 +55,9 @@ pipeline {
                     if (env.GIT_BRANCH == 'origin/master') {
                         docker.image("${DOCKER_IMAGE}_${PROD}:${env.BUILD_NUMBER}")
                           .run('-p 80:80')
-                        }
                     } else if (env.GIT_BRANCH == 'origin/dev') {
-                        docker.image("${DOCKER_IMAGE}_${env.GIT_BRANCH.split('/')[-1]}:${env.BUILD_NUMBER}").run('-p 80:80')
+                        docker.image("${DOCKER_IMAGE}_${env.GIT_BRANCH.split('/')[-1]}:${env.BUILD_NUMBER}")
+                          .run('-p 80:80')
                     }
                 }
             }
