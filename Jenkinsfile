@@ -26,7 +26,11 @@ pipeline {
             steps {
                 script {
                     // Build Docker image
-                    docker.build("${DOCKER_IMAGE}_${env.GIT_BRANCH.split('/')[-1]}:${env.BUILD_NUMBER}")
+                    if (env.GIT_BRANCH == 'origin/master') {
+                        docker.build("${DOCKER_IMAGE}_${PROD}:${env.BUILD_NUMBER}")
+                    } else if (env.GIT_BRANCH == 'origin/dev') {
+                        docker.build("${DOCKER_IMAGE}_${env.GIT_BRANCH.split('/')[-1]}:${env.BUILD_NUMBER}")
+                    }
                 }
             }
         }
