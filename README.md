@@ -17,6 +17,7 @@ Branch<br >
    ![Outbound Rule](./assets/Sg_outbound.png) <br >
 
 2. **EC2 Console**
+   ![EC2 Console](./assets/EC2_console.png) <br >
 
 ## Jenkins
 1. **Jenkins Login**
